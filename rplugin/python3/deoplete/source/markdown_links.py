@@ -17,7 +17,7 @@ class Source(Base):
         self.filetypes = ['markdown']
         self.min_pattern_length = 0
         self.matcher_key = 'abbr'
-        self.__pattern = re.compile(r'\[\[[^\]]*(?!\]\])$')
+        self.__pattern = re.compile(r'\([^\)]*(?!\))$')
 
     def on_init(self, context: UserContext):
         if 'deoplete#sources#markdown_links#name_pattern' in context['vars']:
@@ -25,7 +25,7 @@ class Source(Base):
 
     def get_complete_position(self, context: UserContext) -> int:
         match = self.__pattern.search(context['input'])
-        return match.start() + 2 if match is not None else -1
+        return match.start() + 1 if match is not None else -1
 
     def gather_candidates(self, context: UserContext) -> Candidates:
         directory = dirname(join(context['cwd'], context['bufname']))
@@ -39,6 +39,6 @@ class Source(Base):
                 abbr = match[0]
             except:
                 abbr = x
-            return {'word': x + ']]', 'abbr': abbr}
+            return {'word': x + ')', 'abbr': abbr}
         result = [transform(x) for x in words if len(x) > 0]
         return result
